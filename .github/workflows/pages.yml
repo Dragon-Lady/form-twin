@@ -1,0 +1,50 @@
+name: Pages (manual approval required)
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_deploy:
+        description: "The maintainer has explicitly approved this deployment"
+        type: boolean
+        default: false
+        required: true
+permissions:
+  contents: read
+concurrency:
+  group: pages
+  cancel-in-progress: false
+jobs:
+  deploy:
+    if: >-
+      github.repository == 'Dragon-Lady/form-twin' &&
+      github.repository_owner == 'Dragon-Lady' &&
+      github.event.repository.private == false &&
+      github.ref == 'refs/heads/main' &&
+      inputs.confirm_deploy == true &&
+      vars.PAGES_DEPLOY_APPROVED == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: "24"
+          cache: npm
+      - run: npx --yes sfw@2.0.6 npm ci --ignore-scripts --no-audit --no-fund
+      - run: npm run typecheck
+      - run: npm run build
+      - run: npm run test:precache
+      - uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3
+        with:
+          path: dist
+      - name: Deploy approved build
+        id: deployment
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4

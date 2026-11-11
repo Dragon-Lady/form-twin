@@ -1,0 +1,71 @@
+@page {
+  size: letter;
+  margin: 16mm;
+}
+@media print {
+  body {
+    background: white;
+    color: #111;
+    font-family: Arial, sans-serif;
+  }
+  .sidebar,
+  .topbar,
+  .page-heading,
+  .no-print,
+  #notices,
+  .copy-fallback,
+  dialog,
+  .skip {
+    display: none !important;
+  }
+  .shell {
+    display: block;
+    min-height: 0;
+  }
+  .workspace,
+  main {
+    padding: 0;
+    margin: 0;
+    max-width: none;
+  }
+  main > *:not(#answers-sheet) {
+    display: none !important;
+  }
+  #answers-sheet {
+    display: block;
+    border: 0;
+    border-radius: 0;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    max-width: none;
+    font-size: 10pt;
+  }
+  #answers-sheet:empty::before {
+    content: "Choose sections and build an answers sheet before printing.";
+  }
+  .print-entry {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  .print-section > h3 {
+    break-after: avoid;
+  }
+  .print-section h3 {
+    margin: 16px 0 9px;
+  }
+  .print-entry h4 {
+    font-size: 11pt;
+  }
+  .print-entry p {
+    font-size: 10pt;
+    line-height: 1.4;
+  }
+  .sheet-footer {
+    font-size: 9pt;
+    margin-top: 18px;
+  }
+  .answers-sheet .eyebrow {
+    color: #333;
+  }
+}
