@@ -83,7 +83,7 @@ npm run test:e2e
 npm run test:privacy
 ```
 
-On Linux CI, Playwright's `--with-deps` option also installs required browser system libraries. CI bootstraps the pinned `sfw` wrapper, then uses it for package and browser installs. TypeScript runs as a separate check; Vite compilation alone is not a type check.
+CI uses the Ubuntu runner's existing system libraries and downloads Chromium and Firefox through the pinned `sfw` wrapper. Browser dependency validation and the full browser test suite remain enabled. CI also uses the wrapper for package installs. TypeScript runs as a separate check; Vite compilation alone is not a type check.
 
 The time-zone script runs fixed-clock month tests in four zones, including the last day of a month at 23:59. The precache check compares the generated service worker against every emitted app asset. Browser tests use Chromium and Firefox; actual clipboard/paste permissions and PDF output are Chromium-only. Both browsers exercise offline reload and saving after service-worker control. Chromium additionally blocks every routed network host. Accessibility checks cover overview, editing, coverage and backups with axe. See [the review checklist](docs/review-checklist.md) for the required regression mapping.
 
