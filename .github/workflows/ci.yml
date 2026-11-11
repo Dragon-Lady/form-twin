@@ -38,7 +38,21 @@ jobs:
         run: |
           npm run build
           npm run test:precache
+      - name: Use official HTTPS Ubuntu mirrors
+        run: |
+          # Avoid a stalled Azure mirror retrying every browser dependency.
+          sudo tee /etc/apt/apt-mirrors.txt >/dev/null <<'MIRRORS'
+          https://archive.ubuntu.com/ubuntu
+          https://security.ubuntu.com/ubuntu
+          MIRRORS
+          sudo tee /etc/apt/apt.conf.d/zzzz-ci-network >/dev/null <<'APT'
+          Acquire::Retries "0";
+          Acquire::http::Timeout "20";
+          Acquire::https::Timeout "20";
+          APT
+          apt-config dump Acquire::Retries Acquire::http::Timeout Acquire::https::Timeout
       - name: Install test browsers through Socket Firewall
+        timeout-minutes: 8
         run: npx --yes sfw@2.0.6 npx --no-install playwright install --with-deps chromium firefox
       - name: Browser, offline, clipboard, print and accessibility checks
         run: npm run test:e2e
