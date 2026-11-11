@@ -2,7 +2,7 @@
 
 Your answers, together. An offline notebook for the details that forms keep asking for: addresses, work history, providers, medicines, insurance, contacts, names and custom lists.
 
-**0.1.0 is under review.** This repository is public; the notebook you create stays in your own browser. There is no hosted deployment yet.
+**Form Twin 0.1.0** is an open-source notebook. [Open Form Twin](https://dragon-lady.github.io/form-twin/) or run it locally. The code is public; the notebook you create stays in your own browser.
 
 ## What it does
 
@@ -20,7 +20,7 @@ The app starts empty. Examples in tests are fictional and are not loaded into yo
 
 Answers are stored in IndexedDB on the current browser profile. They are **not encrypted**. Anyone who can access that profile can read them. Clearing site data, private browsing, storage eviction or losing the device can remove the notebook. Keep a separate backup somewhere private. Moving to another device means exporting and importing a backup yourself.
 
-The app has no analytics, advertising, third-party fonts, data upload or remote API. Editing, copying, checking dates, printing and restoring backups run locally. The first visit downloads static application files. When online, the browser can check those static files for updates; no notebook answers are attached to those requests. An eventual static hosting provider can see ordinary connection metadata. Offline readiness is tied to the origin and browser profile used for the first visit.
+The app has no analytics, advertising, third-party fonts, data upload or remote API. Editing, copying, checking dates, printing and restoring backups run locally. The first visit downloads static application files. When online, the browser can check those static files for updates; no notebook answers are attached to those requests. The static hosting provider can see ordinary connection metadata. Offline readiness is tied to the origin and browser profile used for the first visit.
 
 Printed sheets and JSON backups contain personal details. The backup includes **all current entries and all saved history**, including versions retained after deleting an entry. Every deletion asks whether to remove the entry's history too. Retained versions remain visible in Saved history and can be deleted there. Erase all notebook data removes local entries, history, profiles and custom sections; it cannot remove files already exported.
 
@@ -89,13 +89,13 @@ The time-zone script runs fixed-clock month tests in four zones, including the l
 
 The privacy script reads private blocked terms from `PUSH_GUARD_BLOCKED_TERMS` or the existing local Push Guard configuration outside the repo. It never prints matches. Set `REQUIRE_PRIVATE_TERMS=true` to require those terms; owner CI does this. Fork PRs receive generic checks without access to repository secrets and still require the maintainer's private check before acceptance. Run Push Guard on every outgoing commit range before pushing; the lightweight privacy script does not replace it. Keep real notebook exports, browser profiles and private logs out of issues and test artifacts.
 
-## Deployment and release hold
+## Deployment and releases
 
 The base, manifest scope and start URL are `/form-twin/`. Changing the deployment path requires updating and retesting all three. `vite-plugin-pwa` is the only service-worker mechanism. The only app data dependency is `idb`; Workbox handles the bundled service worker.
 
-Pages never runs on a push or pull request. Its workflow requires all of the following: the expected public repository and owner, the `main` branch, an explicit manual confirmation, and a repository variable `PAGES_DEPLOY_APPROVED` set to `true`. That variable is intentionally unset during review. After separate maintainer approval, configure Pages to use GitHub Actions, enable the gate for the approved deployment and dispatch the workflow, then clear the gate. A protected `github-pages` environment can add another approval layer.
+Pages never runs on a push or pull request. Its workflow requires all of the following: the expected public repository and owner, the `main` branch, an explicit manual confirmation, and a repository variable `PAGES_DEPLOY_APPROVED` set to `true`. Keep that variable unset between deployments. With maintainer approval, configure Pages to use GitHub Actions, enable the gate for the approved deployment and dispatch the workflow, then clear the gate. A protected `github-pages` environment can add another approval layer.
 
-Merging, deploying, tagging and releasing each remain subject to maintainer approval. No npm or PyPI publication is planned.
+Releases require passing CI and maintainer approval. The app is distributed through GitHub Pages and GitHub releases; no npm or PyPI package is needed.
 
 ## Sources and license
 
