@@ -67,6 +67,7 @@ test("create and edit an entry, inspect history, and persist after reload", asyn
     .getByLabel("Other names used (include dates)", { exact: true })
     .fill("M. Example, 2020–2022");
   await page.getByRole("button", { name: "Save entry", exact: true }).click();
+  await expect(page.getByRole("dialog")).not.toBeVisible();
   await page.reload();
   await nav(page, "About me");
   await expect(
