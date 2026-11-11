@@ -14,7 +14,7 @@ import {
   validateBackup,
   validateEntry,
 } from "../../src/model/schema";
-import { backup, card, custom, entry, now, ssn } from "./fixtures";
+import { backup, card, cardPastes, custom, entry, now, ssn } from "./fixtures";
 let db: Database;
 beforeEach(async () => {
   db = await openNotebook("test-" + crypto.randomUUID());
@@ -110,6 +110,69 @@ describe("storage and backups", () => {
       "payment card",
     );
     expect((await snapshot(db)).history).toEqual([]);
+  });
+  it.each(cardPastes())(
+    "refuses $name in imported entries and history before any write",
+    async ({ value }) => {
+      await saveEntry(db, entry());
+      const before = await snapshot(db);
+      for (const isCustom of [false, true]) {
+        for (const collection of ["entries", "history"] as const) {
+          const section = custom();
+          const unsafe = isCustom
+            ? { ...entry("about", { notes: value }), sectionId: section.id }
+            : entry("about", {
+                legalName: "Morgan Example",
+                otherNames: value,
+              });
+          const incoming = backup();
+          if (isCustom) incoming.sections = [section];
+          if (collection === "entries") incoming.entries = [unsafe];
+          else
+            incoming.history = [
+              {
+                id: crypto.randomUUID(),
+                entryId: unsafe.id,
+                entry: unsafe,
+                savedAt: now,
+              },
+            ];
+          const spy = vi.spyOn(db, "transaction");
+          const error = await importBackup(db, JSON.stringify(incoming)).then(
+            () => null,
+            (error: Error) => error,
+          );
+          expect(spy).not.toHaveBeenCalled();
+          spy.mockRestore();
+          expect(error?.message).toContain(
+            isCustom ? "Example form / Notes" : "About me / Other names used",
+          );
+          expect(error?.message).toContain("remove the full payment card");
+          expect(error?.message).not.toContain(value);
+          expect(error?.message).not.toContain(card());
+          expect(await snapshot(db)).toEqual(before);
+        }
+      }
+    },
+  );
+  it("refuses card details on save and leaves the entry and its history unchanged", async () => {
+    const original = entry("about", { legalName: "Morgan Example" });
+    await saveEntry(db, original);
+    const before = await snapshot(db);
+    for (const { value } of cardPastes()) {
+      await expect(
+        saveEntry(
+          db,
+          {
+            ...original,
+            fields: { ...original.fields, otherNames: value },
+            updatedAt: "2026-02-01T12:00:00.000Z",
+          },
+          original.updatedAt,
+        ),
+      ).rejects.toThrow("remove the full payment card");
+      expect(await snapshot(db)).toEqual(before);
+    }
   });
   it("guards custom values and labels without reflecting numbers", async () => {
     const section = custom(),

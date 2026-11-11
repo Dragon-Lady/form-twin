@@ -66,11 +66,19 @@ export function forbiddenNumber(
     for (const match of value.matchAll(/(?<!\d)\d{9}(?!\d)/g))
       if (plausibleSSN(match[0])) return "ssn";
   if (kind === "text" || kind === "custom")
-    for (const match of value.matchAll(
-      /(?<!\d)\d(?:[ -]?\d){12,18}(?![ -]?\d)/g,
-    )) {
-      const digits = match[0].replace(/\D/g, "");
-      if (knownCardPrefix(digits) && luhn(digits)) return "card";
+    for (const match of value.matchAll(/\d+(?:[ -]\d+)*/g)) {
+      const groups = match[0].split(/[ -]/);
+      // A pasted expiry or CVV may share the run with the card. Check each
+      // complete-group window, without slicing inside a longer identifier.
+      for (let start = 0; start < groups.length; start++) {
+        let digits = "";
+        for (let end = start; end < groups.length; end++) {
+          if (digits.length + groups[end].length > 19) break;
+          digits += groups[end];
+          if (digits.length >= 13 && knownCardPrefix(digits) && luhn(digits))
+            return "card";
+        }
+      }
     }
   return null;
 }

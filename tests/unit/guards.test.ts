@@ -5,7 +5,7 @@ import {
   knownCardPrefix,
   luhn,
 } from "../../src/model/guards";
-import { card, ssn } from "./fixtures";
+import { card, cardPastes, ssn } from "./fixtures";
 import type { FieldKind } from "../../src/model/types";
 describe("field-aware guards", () => {
   it.each([
@@ -54,6 +54,36 @@ describe("field-aware guards", () => {
   it.each(["text", "custom"] as const)(
     "refuses known-prefix Luhn cards in %s",
     (kind) => expect(forbiddenNumber(`Notes ${card()} end`, kind)).toBe("card"),
+  );
+  it.each(cardPastes())("refuses $name without echoing it", ({ value }) => {
+    for (const kind of ["text", "custom"] as const) {
+      expect(forbiddenNumber(value, kind)).toBe("card");
+      try {
+        guard(value, kind, "Example section", "Notes");
+        throw new Error("expected refusal");
+      } catch (error) {
+        expect((error as Error).message).toContain(
+          "Example section / Notes: remove the full payment card",
+        );
+        expect((error as Error).message).not.toContain(value);
+        expect((error as Error).message).not.toContain(card());
+      }
+    }
+  });
+  it("finds a card after preceding numeric groups", () => {
+    expect(forbiddenNumber(`12/28 ${card()} 123`, "text")).toBe("card");
+  });
+  it("does not cut a card-shaped substring out of a longer digit group", () => {
+    const digits = card().replaceAll(" ", "");
+    expect(forbiddenNumber(`${digits}0000`, "text")).toBeNull();
+    expect(forbiddenNumber(`9${digits}99`, "custom")).toBeNull();
+  });
+  it.each(["12345-6789", "123456789", "202-555-0100", "+1 202 555 0100"])(
+    "allows ordinary postal codes and phones in free text (%s)",
+    (value) => {
+      expect(forbiddenNumber(value, "text")).toBeNull();
+      expect(forbiddenNumber(value, "custom")).toBeNull();
+    },
   );
   it("requires both known prefix and checksum", () => {
     expect(forbiddenNumber("8".repeat(16), "text")).toBeNull();

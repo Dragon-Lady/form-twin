@@ -1,7 +1,15 @@
 import { test, expect } from "@playwright/test";
 import type { Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
-import { backup, card, custom, entry, now, ssn } from "../unit/fixtures";
+import {
+  backup,
+  card,
+  cardPastes,
+  custom,
+  entry,
+  now,
+  ssn,
+} from "../unit/fixtures";
 async function start(page: Page) {
   await page.goto("./");
   await expect(
@@ -158,7 +166,18 @@ test("custom-field paste uses the same guard and never saves a full number", asy
     .click();
   await page.getByRole("button", { name: "+ Add entry", exact: true }).click();
   const field = page.getByRole("dialog").getByLabel("Notes", { exact: true });
-  for (const value of [ssn(), card()]) {
+  for (const value of [
+    ssn(),
+    card(),
+    ...cardPastes().map((paste) => paste.value),
+  ]) {
+    await field.fill("");
+    await field.pressSequentially(value);
+    await expect(page.locator(".field-error")).toContainText(
+      "Example checklist / Notes: remove the full",
+    );
+    await page.getByRole("button", { name: "Save entry", exact: true }).click();
+    await expect(page.getByRole("dialog")).toBeVisible();
     await field.fill("");
     await page.evaluate((value) => navigator.clipboard.writeText(value), value);
     await field.focus();

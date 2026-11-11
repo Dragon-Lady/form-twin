@@ -42,3 +42,19 @@ export function custom(): Section {
 }
 export const ssn = () => ["123", "45", "6789"].join("-");
 export const card = () => ["4111", "1111", "1111", "1111"].join(" ");
+export const cardPastes = () => [
+  { name: "spaced card with expiry", value: `${card()} 12/28` },
+  { name: "spaced card with CVV", value: `${card()} 123` },
+  {
+    name: "dashed card with compact expiry",
+    value: `${card().replaceAll(" ", "-")} 0128`,
+  },
+  {
+    name: "bare card with expiry",
+    value: `${card().replaceAll(" ", "")} 12/28`,
+  },
+  {
+    name: "dashed card with dash before CVV",
+    value: `${card().replaceAll(" ", "-")}-123`,
+  },
+];
