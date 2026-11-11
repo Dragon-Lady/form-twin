@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#214f48" />
+    <meta
+      name="description"
+      content="A private, offline answers notebook for the forms life keeps asking you to fill in."
+    />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; frame-src 'none'"
+    />
+    <link rel="icon" href="/form-twin/icon.svg" type="image/svg+xml" />
+    <link rel="manifest" href="/form-twin/manifest.webmanifest" />
+    <title>Form Twin — Your answers, together</title>
+  </head>
+  <body>
+    <a class="skip" href="#content">Skip to content</a>
+    <div id="app"></div>
+    <div id="notices" role="status" aria-live="polite"></div>
+    <dialog id="editor" aria-labelledby="dialog-title"></dialog>
+    <noscript
+      >Form Twin needs JavaScript to save your answers on this device.</noscript
+    >
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

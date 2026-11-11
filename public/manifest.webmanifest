@@ -1,0 +1,26 @@
+{
+  "name": "Form Twin",
+  "short_name": "Form Twin",
+  "description": "Your personal answers notebook, offline and on your device.",
+  "id": "/form-twin/",
+  "start_url": "/form-twin/",
+  "scope": "/form-twin/",
+  "display": "standalone",
+  "background_color": "#f6f4ee",
+  "theme_color": "#214f48",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}
